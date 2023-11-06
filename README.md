@@ -22,6 +22,14 @@
 
 > Если последняя команда не работает, попробуйте вместо `python` писать `py` или `python3`
 
+##  Описание файла `config.json`
+- `scroll_rpc_url` - адрес RPC Scroll
+- `eth_rpc_url` - адрес RPC Ethereum
+- `scroll_explorer_url` - адрес Scroll Explorer
+- `max_gwei` - максимальная стоимость газа в сети Ethereum, при которой будет работать бот
+- `min_length` и `max_length` - минимальная и максимальная длина названий функций, контрактов, переменных, аргументов
+- `min_sleep_time` и `max_sleep_time` - минимальное и максимальное время сна между кошельками
+
 ---
 
 Создано командой [Hinkok Soft](https://t.me/HinkokSoft)
