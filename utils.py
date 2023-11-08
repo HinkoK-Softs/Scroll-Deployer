@@ -1,8 +1,11 @@
+import datetime as dt
 import random
 import string
 import time
 
 from eth_typing import HexStr
+import requests
+from web3 import Web3
 from web3.eth import Eth
 from web3.types import TxReceipt
 
@@ -53,3 +56,34 @@ def sleep(sleep_time: float):
 def random_sleep(min_sleep_time: float, max_sleep_time: float):
     sleep_time = round(random.uniform(min_sleep_time, max_sleep_time), 2)
     sleep(sleep_time)
+
+
+def suggest_gas_fees(
+    chain_id: int
+):
+    last_update = getattr(suggest_gas_fees, 'last_update', dt.datetime.fromtimestamp(0))
+    last_chain_id = getattr(suggest_gas_fees, 'chain_id', None)
+    if dt.datetime.now() - last_update > dt.timedelta(seconds=10) or last_chain_id != chain_id:
+        try:
+            response = requests.get(
+                url=f'https://gas-api.metaswap.codefi.network/networks/{chain_id}/suggestedGasFees'
+            )
+        except Exception:
+            logger.error(f'[Gas] Failed to get gas price for chain with ID {chain_id}')
+            return None
+        else:
+            if response.status_code != 200:
+                logger.error(f'[Gas] Failed to get gas price for chain with ID {chain_id}: {response.text}')
+                return None
+            gas_json = response.json()
+            medium_gas = gas_json['medium']
+            gas_price = {
+                'maxFeePerGas': Web3.to_wei(medium_gas['suggestedMaxFeePerGas'], 'gwei'),
+                'maxPriorityFeePerGas': Web3.to_wei(medium_gas['suggestedMaxPriorityFeePerGas'], 'gwei')
+            }
+            suggest_gas_fees.gas_price = gas_price
+            suggest_gas_fees.last_update = dt.datetime.now()
+            suggest_gas_fees.chain_id = chain_id
+            return gas_price
+    else:
+        return getattr(suggest_gas_fees, 'gas_price', None)
