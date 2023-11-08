@@ -4,12 +4,15 @@ from pydantic import BaseModel, field_validator
 class Config(BaseModel):
     scroll_rpc_url: str
     eth_rpc_url: str
+    arbitrum_rpc_url: str
     scroll_explorer_url: str
+    arbitrum_explorer_url: str
     max_gwei: float
     min_length: int
     max_length: int
     min_sleep_time: float
     max_sleep_time: float
+    bridge_amount: float
 
     @classmethod
     def load(cls):
@@ -52,5 +55,12 @@ class Config(BaseModel):
             raise ValueError('Max sleep time must be positive')
         elif v < values.data['min_sleep_time']:
             raise ValueError('Max sleep time must be greater than min sleep time')
+
+        return v
+
+    @field_validator('bridge_amount')
+    def check_bridge_amount(cls, v: float):
+        if v <= 0:
+            raise ValueError('Bridge amount must be positive')
 
         return v
