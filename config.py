@@ -60,7 +60,7 @@ class Config(BaseModel):
 
     @field_validator('bridge_amount')
     def check_bridge_amount(cls, v: float):
-        if v <= 0:
-            raise ValueError('Bridge amount must be positive')
+        if v < 0:
+            raise ValueError('Bridge amount must be non-negative')
 
         return v
